@@ -4,10 +4,9 @@ import urllib, urllib2
 import re
 import traceback
 from database import CrawlerDb
-import urlparse
 from urllib import urlencode
-import requests_html
-
+import urlparse
+from bs4 import BeautifulSoup
 # Debugging
 # import pdb;pdb.set_trace()
 
@@ -48,8 +47,15 @@ def crawl(keywords):
 		db.enqueue(unicode(url))
 
 		data = retrieve_html(url)
-		print("data: \n%s" % data)
-
+		soup = BeautifulSoup(data, 'html.parser')
+		for link in soup.find_all('a'):
+			link = link.get("href")
+			if 'google' not in link:
+				if 'blogger' not in link:
+					if 'youtube' not in link:
+						db.enqueue(link)
+						link = urlparse.urlsplit(link).netloc
+						db.enqueue(link)
 		for url in google_url_regex.findall(data):
 			db.enqueue(unicode(url))
 		for url in google_adurl_regex.findall(data):
@@ -58,7 +64,6 @@ def crawl(keywords):
 	try:
 		imaging_url = 'http://www.google.com/search?' + urlencode(query) + '&source=lnms&tbm=isch&sa=X&ved=0'
 		data = retrieve_html(imaging_url)
-		print("data: \n%s" % data)
 		for url in google_url_regex.findall(data):
 			db.enqueue(unicode(url))
 		for url in google_adurl_regex.findall(data):
@@ -73,7 +78,6 @@ def crawl(keywords):
 				absolute_link.append(link)
 		for link in absolute_link:
 			data = retrieve_html(link)
-			print("data: \n%s" % data)
 			for url in google_url_regex.findall(data):
 				db.enqueue(unicode(url))
 			for url in google_adurl_regex.findall(data):
