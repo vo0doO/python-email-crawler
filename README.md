@@ -1,28 +1,25 @@
-Python Email Crawler
+Python Email Ползунок
 ====================
 
-This python script search/google certain keywords, crawls the webpages from the results, and return all emails found.
-
-Requirements
+Этот скрипт Python выполняет поиск / поиск по определенным ключевым словам в Google, сканирует веб-страницы по результатам и возвращает все найденные электронные письма.
+Требования
 ------------
 
 - sqlalchemy
 - urllib2
 
-If you don't have, simply `sudo pip install sqlalchemy`. 
+Если у вас нет, просто `sudo pip install sqlalchemy`. 
 
 
-Usage
+употребление
 -------
 
-Start the search with a keyword. We use "iphone developers" as an example.
-
+Начните поиск с ключевого слова. Мы используем «разработчиков iPhone» в качестве примера.
 	python email_crawler.py "iphone developers"
 
-The search and crawling process will take quite a while, as it retrieve up to 500 search results (from Google), and crawl up to 2 level deep. It should crawl around 10,000 webpages :)
-
-After the process finished, run this command to get the list of emails
-
+Процесс поиска и сканирования займет много времени, поскольку он извлекает до 500 результатов поиска (из Google) и сканирует до 2 уровня. Это должно ползти около 10000 веб-страниц :)
+После завершения процесса запустите эту команду, чтобы получить список писем
+	
 	python email_crawler.py --emails
 
-The emails will be saved in ./data/emails.csv
+Письма будут сохранены в ./data/emails.csv

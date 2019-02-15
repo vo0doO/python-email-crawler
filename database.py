@@ -1,8 +1,10 @@
-from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Boolean, MetaData, select
+from sqlalchemy import create_engine, Table, Column, String, Integer, Unicode, Boolean, MetaData, select
 import urlparse
+import os
 
 DATABASE_NAME = 'data/crawler.sqlite'
-HTML_DIR = 'data/html/'
+HTML_DIR = 'index.html'
+
 
 class CrawlerDb:
 
@@ -37,7 +39,7 @@ class CrawlerDb:
 		res.close()
 		# If we get a result, then this url is not unique
 		if len(result) > 0:
-# 			print 'Duplicated: %s' % url
+ 			print 'Duplicated: %s' % url
 			return False
 
 		args = [{'url':unicode(url)}]
@@ -121,7 +123,7 @@ class CrawlerDb:
 		
 
 	def save_html(filename, html):
-		filename = os.path.join(HTML_DIR, filename)
+		filename = '/home/node/PycharmProjects/python-email-crawler/data/index.html'
 		file = open(filename,"w+")
 		file.writelines(html)
 		file.close()

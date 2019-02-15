@@ -1,9 +1,14 @@
 from settings import LOGGING
 import logging, logging.config
 import urllib, urllib2
-import re, urlparse
+import re
 import traceback
 from database import CrawlerDb
+import requests
+from bs4 import BeautifulSoup
+import urlparse
+from urllib import urlencode
+
 
 # Debugging
 # import pdb;pdb.set_trace()
@@ -16,52 +21,37 @@ google_adurl_regex = re.compile('adurl=(.*?)"')
 google_url_regex = re.compile('url\?q=(.*?)&amp;sa=')
 email_regex = re.compile('([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4})', re.IGNORECASE)
 url_regex = re.compile('<a\s.*?href=[\'"](.*?)[\'"].*?>')
-# Below url_regex will run into 'Castrophic Backtracking'!
+# belowUrl_regexWillMeetWith <<Castrophic Backtracking>>!
 # http://stackoverflow.com/questions/8010005/python-re-infinite-execution
 # url_regex = re.compile('<a\s(?:.*?\s)*?href=[\'"](.*?)[\'"].*?>')
 
-# Maximum number of search results to start the crawl
-MAX_SEARCH_RESULTS = 150
+MAX_SEARCH_RESULTS = 300
 
 EMAILS_FILENAME = 'data/emails.csv'
 DOMAINS_FILENAME = 'data/domains.csv'
 
-# Set up the database
 db = CrawlerDb()
 db.connect()
 
 
 def crawl(keywords):
-	"""
-	This method will
 
-	1) Google the keywords, and extract MAX_SEARCH_RESULTS
-	2) For every result (aka website), crawl the website 2 levels deep.
-		That is the homepage (level 1) and all it's links (level 2).
-		But if level 1 has the email, then skip going to level 2.
-	3) Store the html in /data/html/ and update the database of the crawled emails
-
-	crawl(keywords):
-		Extract Google search results and put all in database
-		Process each search result, the webpage:
-			Crawl webpage level 1, the homepage
-			Crawl webpage level 2, a link away from the homepage
-			Update all crawled page in database, with has_crawled = True immediately
-			Store the HTML
-	"""
 	logger.info("-"*40)
 	logger.info("Keywords to Google for: %s" % keywords.decode('utf-8'))
 	logger.info("-"*40)
 
-	# Step 1: Crawl Google Page
+	# Step 1: GooglePageScan
 	# eg http://www.google.com/search?q=singapore+web+development&start=0
 	# Next page: https://www.google.com/search?q=singapore+web+development&start=10
-	# Google search results are paged with 10 urls each. There are also adurls
+	# Google search results are paginated by 10 URLs each. There are also adurls
 	for page_index in range(0, MAX_SEARCH_RESULTS, 10):
 		query = {'q': keywords}
-		url = 'http://www.google.com/search?' + urllib.urlencode(query) + '&start=' + str(page_index)
+		url = 'http://www.google.com/search?' + urlencode(query) + '&start=' + str(page_index)
+		db.enqueue(unicode(url))
+
 		data = retrieve_html(url)
-		# 	print("data: \n%s" % data)
+		print("data: \n%s" % data)
+
 		for url in google_url_regex.findall(data):
 			db.enqueue(unicode(url))
 		for url in google_adurl_regex.findall(data):
@@ -90,6 +80,9 @@ def retrieve_html(url):
 	req.add_header('User-Agent', 'Just-Crawling 0.1')
 	request = None
 	status = 0
+
+
+
 	try:
 		logger.info("Crawling %s" % url)
 		request = urllib2.urlopen(req)
@@ -107,6 +100,7 @@ def retrieve_html(url):
 	except Exception, e:
 		return
 
+	db.save_html(data)
 	return str(data)
 
 
