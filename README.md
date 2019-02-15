@@ -8,18 +8,38 @@ Python Email Ползунок
 - sqlalchemy
 - urllib2
 
-Если у вас нет, просто `sudo pip install sqlalchemy`. 
+Если у вас нет, просто `sudo pip2 install sqlalchemy`. 
 
 
 употребление
 -------
 
 Начните поиск с ключевого слова. Мы используем «разработчиков iPhone» в качестве примера.
-	python email_crawler.py "iphone developers"
+	
+	python2.7 email_crawler.py "iphone developers"
 
 Процесс поиска и сканирования займет много времени, поскольку он извлекает до 500 результатов поиска (из Google) и сканирует до 2 уровня. Это должно ползти около 10000 веб-страниц :)
 После завершения процесса запустите эту команду, чтобы получить список писем
 	
-	python email_crawler.py --emails
+	python2.7 email_crawler.py --emails
 
 Письма будут сохранены в ./data/emails.csv
+
+Доп настройка
+-------
+Устанавливаем python3.6 - только с ним будет работать герератор абсолютных ссылок
+	
+	sudo apt install python3.6 && sudo apt install python3-pip
+Потом ставим библиотеки
+	
+	pip3 install requests, requests_html
+Надо сгенерировать для анализатора абсолютные ссылки
+	
+	python3.6 get_link_for_crawler.py "текст запроса в поисковике"
+Полученный файл `link_for_crawler.txt`нужно скопировать кореневую папку программы
+
+Ещё когда сам crawler отработает можно получить все уникальные домены
+	
+	python2.7 email_crawler.py --domains
+
+Домены будут сохранены в ./data/emails.csv

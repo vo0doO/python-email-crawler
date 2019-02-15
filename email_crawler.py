@@ -4,11 +4,9 @@ import urllib, urllib2
 import re
 import traceback
 from database import CrawlerDb
-import requests
-from bs4 import BeautifulSoup
 import urlparse
 from urllib import urlencode
-
+import requests_html
 
 # Debugging
 # import pdb;pdb.set_trace()
@@ -45,7 +43,7 @@ def crawl(keywords):
 	# Next page: https://www.google.com/search?q=singapore+web+development&start=10
 	# Google search results are paginated by 10 URLs each. There are also adurls
 	for page_index in range(0, MAX_SEARCH_RESULTS, 10):
-		query = {'q': keywords}
+		query = { "q": keywords}
 		url = 'http://www.google.com/search?' + urlencode(query) + '&start=' + str(page_index)
 		db.enqueue(unicode(url))
 
@@ -57,6 +55,31 @@ def crawl(keywords):
 		for url in google_adurl_regex.findall(data):
 			db.enqueue(unicode(url))
 
+	try:
+		imaging_url = 'http://www.google.com/search?' + urlencode(query) + '&source=lnms&tbm=isch&sa=X&ved=0'
+		data = retrieve_html(imaging_url)
+		print("data: \n%s" % data)
+		for url in google_url_regex.findall(data):
+			db.enqueue(unicode(url))
+		for url in google_adurl_regex.findall(data):
+			db.enqueue(unicode(url))
+	except Exception, e:
+		print e.args
+	try:
+		absolute_link = []
+		with open('/home/user/link_for_crawler.txt') as f:
+			lines = f.readlines()
+			for link in lines:
+				absolute_link.append(link)
+		for link in absolute_link:
+			data = retrieve_html(link)
+			print("data: \n%s" % data)
+			for url in google_url_regex.findall(data):
+				db.enqueue(unicode(url))
+			for url in google_adurl_regex.findall(data):
+				db.enqueue(unicode(url))
+	except Exception, e:
+		print e.args
 	# Step 2: Crawl each of the search result
 	# We search till level 2 deep
 	while (True):

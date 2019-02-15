@@ -123,7 +123,7 @@ class CrawlerDb:
 		
 
 	def save_html(filename, html):
-		filename = '/home/node/PycharmProjects/python-email-crawler/data/index.html'
+		filename = os.path.dirname(os.path.abspath(__file__)) + '/data/index.html'
 		file = open(filename,"w+")
 		file.writelines(html)
 		file.close()
