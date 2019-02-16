@@ -228,6 +228,16 @@ if __name__ == "__main__":
 			file.close()
 			logger.info("All domains saved to ./data/domains.csv")
 			logger.info("="*40)
+		elif (arg == '--auto') or (arg == '-a'):
+			# Get all the domains and save in a CSV
+			logger.info("=" * 40)
+			logger.info("Processing...")
+			logger.info("There are automatic starts...")
+			arg = input("Please enter you keywords from search: ")
+			arg = str(arg)
+			crawl(arg)
+			logger.info("All integration addon is started")
+			logger.info("=" * 40)
 		else:
 			# Crawl the supplied keywords!
 			crawl(arg)
