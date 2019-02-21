@@ -33,12 +33,26 @@ Python Email Анализатор
 
 По сути в этот момент и дальше происходит следующее просто уже без нашего участия.
 	
+	~$ cp $EMAIL_CRAWLER_HOME/data/crawler.sqlite $EMAIL_CRAWLER_HOME/backup/last-crawler.sqlite
+    ~$ cp $EMAIL_CRAWLER_HOME/data/emails.csv $EMAIL_CRAWLER_HOME/backup/last-emails.csv
+    ~$ cp $EMAIL_CRAWLER_HOME/link_for_crawler.txt $EMAIL_CRAWLER_HOME/backup/last-link_for_crawler.txt
+    ~$ cp $EMAIL_CRAWLER_HOME/data/domains.csv $EMAIL_CRAWLER_HOME/backup/last-domains.csv
 	~$ python3.6 $EMAIL_CRAWLER_HOME/get_link_for_crawler.py
     ~$ python2.7 $EMAIL_CRAWLER_HOME/email_crawler.py --auto
     ~$ python2.7 $EMAIL_CRAWLER_HOME/email_crawler.py --emails
     ~$ python2.7 $EMAIL_CRAWLER_HOME/email_crawler.py --domains
 
-Процесс поиска и сканирования займет много времени, поскольку он извлекает до 500 результатов поиска (из Google) и сканирует до 2 уровня начиная с хрен знает какого уровня, и 2 уровня начиная с базового адреса сайта полученного из поисковой выдачи и из выдачи изображений. Это должно ползти около 10000 веб-страниц :)
+Процесс поиска и сканирования займет много времени, поскольку он извлекает максимальное кол-во результатов поиска сайтов и изображений из Google, доступных в браузере. 
+
+Сканирует 2 уровня начиная с места куда ссылался Google, и 2 уровня начиная с базового url домена. 
+
+С одного захода получается около: 
+- 20 000 веб-страниц;
+- 2 000 доменов:
+- 1 500 email адресов
+
+На последок !
+-------
 В любой момент уже после завершения процесса запустите эту команду, чтобы востановить список ящиков
 	
 	python2.7 email_crawler.py --emails

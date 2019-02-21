@@ -61,12 +61,10 @@ def link_getter(query, max_res):
 	for i in range(0, max_int, 10):
 		url = f"https://www.google.com/search?q={query_url}&start={i}"
 		session = HTMLSession()
-		for t in range(int(1), int(3), int(1)):
-			time.sleep(t)
+		print("=" * 40)
+		print('Search from page: %s' % url)
+		print("Processing...")
 		r = session.get(url)
-		logger.info("=" * 40)
-		logger.info('Page: %s' % url)
-		logger.info("Processing...")
 		for link in r.html.absolute_links:
 			if 'google' not in link:
 				if 'blogger' not in link:
@@ -74,7 +72,8 @@ def link_getter(query, max_res):
 						link = urlsplit(link).netloc
 						if link not in set(link_a):
 							link_a.append(link)
-							print(link)
+							print(f"New domain: {link} !!!")
+							print("I'm search next >>> ")
 	with open(ADDONS_INFO_FILENAME, 'w') as f:
 		f.write(str(query)+'||'+str(max_res) + "\n")
 		for ln in set(link_a):
@@ -82,10 +81,7 @@ def link_getter(query, max_res):
 			f.write(ln + "\n")
 
 
-
 if __name__ == "__main__":
 	query = input('Каков будет Ваш запрос... ? ')
 	max_res = input('А сколько максимум будет выдано результатов ? ')
 	link_getter(query, max_res)
-	
-	
