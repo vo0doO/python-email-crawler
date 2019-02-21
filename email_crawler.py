@@ -281,7 +281,7 @@ def find_links_in_html_with_same_hostname(url, html):
 
 if __name__ == "__main__":
 	import sys
-
+	import time
 	try:
 		arg = sys.argv[1].lower()
 		if (arg == '--emails') or (arg == '-e'):

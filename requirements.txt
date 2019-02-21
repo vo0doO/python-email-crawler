@@ -1,6 +1,4 @@
-logging, logging.config
-urllib2
-traceback
 sqlalchemy
 requests-html
 requests
+bs4
