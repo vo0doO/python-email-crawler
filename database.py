@@ -107,6 +107,8 @@ class CrawlerDb:
 			if (result.emails == None):
 				continue
 			for email in result.emails.split(','):
+				if '.png' in email or '.jpg' in email or '.jpeg' in email:
+					continue
 				email_set.add(email)
 
 		return email_set
@@ -124,9 +126,8 @@ class CrawlerDb:
 			if (result.url == None):
 				continue
 			url = urlparse.urlparse(result.url)
-			hostname = url.hostname.split(".")
+			hostname = url.netloc
 			# Simplistic assumeption of a domain. If 2nd last name is <4 char, then it has 3 parts eg. just2us.com.sg
-			hostname = ".".join(len(hostname[-2]) < 4 and hostname[-3:] or hostname[-2:])
 			domain_set.add(hostname)
 
 		return domain_set

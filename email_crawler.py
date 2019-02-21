@@ -24,9 +24,6 @@ url_regex = re.compile('<a\s.*?href=[\'"](.*?)[\'"].*?>')
 # http://stackoverflow.com/questions/8010005/python-re-infinite-execution
 # url_regex = re.compile('<a\s(?:.*?\s)*?href=[\'"](.*?)[\'"].*?>')
 
-
-
-
 db = CrawlerDb()
 db.connect()
 
