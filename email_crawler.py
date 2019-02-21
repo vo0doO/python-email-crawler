@@ -43,7 +43,7 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 		db.enqueue(unicode(url))
 	# Step. 0.1: up links of image search in db.
 	url = 'http://www.google.com/search?' + urlencode(query) + '&source=lnms&tbm=isch&sa=X&ved=0'
-	#search_url_anal(url)
+	search_url_anal(url)
 
 
 	# Step 1: GooglePageScan
@@ -52,7 +52,7 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 	# Google search results are paginated by 10 URLs each. There are also adurls
 	for page_index in range(0, MAX_SEARCH_RESULTS, 10):
 		url = 'http://www.google.com/search?' + urlencode(query) + '&start=' + str(page_index)
-		#search_url_anal(url)
+		search_url_anal(url)
 
 	# Step 2: Crawl each of the search result
 	# We search till level 2 deep
@@ -282,34 +282,9 @@ def find_links_in_html_with_same_hostname(url, html):
 	return link_set
 
 
-logger.info("=" * 40)
-logger.info("Processing...")
-logger.info("There are automatic starts...")
-CAHE = []
-KEYWORDS = ""
-MAX_SEARCH_RESULTS = ""
-NICE_LINKS = []
-with open(ADDONS_INFO_FILENAME, 'r') as f:
-	lines = f.readlines()
-	for line in lines:
-		CAHE.append(line)
-KEYWORDS = CAHE[0].split("||")[0]
-logger.info('Crawl up your search keywords: %s' % KEYWORDS)
-MAX_SEARCH_RESULTS = CAHE[0].split("||")[-1]
-logger.info('Crawl up your max result: %s' % MAX_SEARCH_RESULTS)
-MAX_SEARCH_RESULTS = int(MAX_SEARCH_RESULTS)
-for ln in CAHE[1:-1]:
-	NICE_LINKS.append('http://' + str(ln).replace('\n', ''))
-logger.info('Crawl up %s nice links !' % str(len(set(NICE_LINKS))))
-logger.info("All addon integration complete")
-logger.info("=" * 40)
-crawl(KEYWORDS, MAX_SEARCH_RESULTS, NICE_LINKS)
-
-
 if __name__ == "__main__":
 	import sys
 
-	""" DEBUG
 	try:
 		arg = sys.argv[1].lower()
 		if (arg == '--emails') or (arg == '-e'):
@@ -334,9 +309,30 @@ if __name__ == "__main__":
 			file.close()
 			logger.info("All domains saved to ./data/domains.csv")
 			logger.info("=" * 40)
+		# OPEN, READ FILE GET AND SEND FROM CRAWL
 		elif (arg == '--auto') or (arg == '-a'):
-			# OPEN, READ FILE GET AND SEND FROM CRAWL
-
+			logger.info("=" * 40)
+			logger.info("Processing...")
+			logger.info("There are automatic starts...")
+			CAHE = []
+			KEYWORDS = ""
+			MAX_SEARCH_RESULTS = ""
+			NICE_LINKS = []
+			with open(ADDONS_INFO_FILENAME, 'r') as f:
+				lines = f.readlines()
+				for line in lines:
+					CAHE.append(line)
+			KEYWORDS = CAHE[0].split("||")[0]
+			logger.info('Crawl up your search keywords: %s' % KEYWORDS)
+			MAX_SEARCH_RESULTS = CAHE[0].split("||")[-1]
+			logger.info('Crawl up your max result: %s' % MAX_SEARCH_RESULTS)
+			MAX_SEARCH_RESULTS = int(MAX_SEARCH_RESULTS)
+			for ln in CAHE[1:-1]:
+				NICE_LINKS.append('http://' + str(ln).replace('\n', ''))
+			logger.info('Crawl up %s nice links !' % str(len(set(NICE_LINKS))))
+			logger.info("All addon integration complete")
+			logger.info("=" * 40)
+			crawl(KEYWORDS, MAX_SEARCH_RESULTS, NICE_LINKS)
 		else:
 			# Crawl the supplied keywords!
 			crawl(arg, MAX_SEARCH_RESULTS=None, NICE_LINKS=None)
@@ -347,4 +343,3 @@ if __name__ == "__main__":
 	except Exception, e:
 		logger.error("EXCEPTION: %s " % e)
 		traceback.print_exc()
-"""
