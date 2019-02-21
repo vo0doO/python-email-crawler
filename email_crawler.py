@@ -5,9 +5,10 @@ import urllib2
 import urlparse
 from urllib import urlencode
 from bs4 import BeautifulSoup
-import time
 from database import CrawlerDb
 from settings import LOGGING, EMAILS_FILENAME, DOMAINS_FILENAME, ADDONS_INFO_FILENAME
+import socket
+socket.setdefaulttimeout(1.0)
 
 # Debugging
 # import pdb;pdb.set_trace()
@@ -27,6 +28,7 @@ url_regex = re.compile('<a\s.*?href=[\'"](.*?)[\'"].*?>')
 
 
 db = CrawlerDb()
+db.connect()
 
 
 def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
@@ -39,9 +41,9 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 	# Step 0: up nice link
 	for url in NICE_LINKS:
 		db.enqueue(unicode(url))
-	# Step. 0: up links of image search in db.
+	# Step. 0.1: up links of image search in db.
 	url = 'http://www.google.com/search?' + urlencode(query) + '&source=lnms&tbm=isch&sa=X&ved=0'
-	search_url_anal(url)
+	#search_url_anal(url)
 
 
 	# Step 1: GooglePageScan
@@ -50,7 +52,7 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 	# Google search results are paginated by 10 URLs each. There are also adurls
 	for page_index in range(0, MAX_SEARCH_RESULTS, 10):
 		url = 'http://www.google.com/search?' + urlencode(query) + '&start=' + str(page_index)
-		search_url_anal(url)
+		#search_url_anal(url)
 
 	# Step 2: Crawl each of the search result
 	# We search till level 2 deep
@@ -73,12 +75,9 @@ def search_url_anal(url):
 	:return:
 	"""
 	try:
-
 		data = retrieve_html(url)
-
 		soup = BeautifulSoup(data, 'html.parser')
 		links_soup = [link.get("href").replace('/url?q=', '') for link in soup.find_all('a')]
-
 		for url in google_url_regex.findall(data):
 			netloc = urlparse.urlsplit(url).netloc
 			if netloc != "":
@@ -149,7 +148,6 @@ def retrieve_html(url):
 	try:
 		logger.info("Crawling %s" % url)
 		request = urllib2.urlopen(req)
-		#time.sleep(0.00000035)
 	except urllib2.URLError, e:
 		logger.error("Exception at url: %s\n%s" % (url, e))
 	except urllib2.HTTPError, e:
@@ -173,7 +171,8 @@ def find_emails_2_level_deep(url):
 	Find the email at level 1.
 	If there is an email, good. Return that email
 	Else, find in level 2. Store all results in database directly, and return None
-
+	"""
+	"""
 	try:
 		html = retrieve_html(url)
 	except Exception, e:
@@ -182,7 +181,6 @@ def find_emails_2_level_deep(url):
 		if urlparse.urlparse(url).scheme == 'http':
 			connect = httplib.HTTPConnection(urlparse.urlparse(url).netloc)
 			connect.request('GET', "")
-			#time.sleep(0.000000035)
 			r1 = connect.getresponse()
 			if r1.getheader('Location') == "".join([urlparse.urlparse(url).scheme, "://", urlparse.urlparse(url).netloc, '/']):
 				logger.info("Url %s is good !" % str(url))
@@ -201,10 +199,8 @@ def find_emails_2_level_deep(url):
 			logger.warning("WTF ??? URL SCHEME NOT HTTP AND NOT HTTP !?!?!?!?")
 	except Exception, e:
 		logger.error("HTTP TEST ERROR: %s" % e)
-	finally:
-	"""
+		"""
 	html = retrieve_html(url)
-
 
 	email_set = find_emails_in_html(html)
 
@@ -217,6 +213,15 @@ def find_emails_2_level_deep(url):
 		logger.info('No email at level 1.. proceeding to crawl level 2')
 
 		link_set = find_links_in_html_with_same_hostname(url, html)
+		tested_links = db.url_from_test()
+		link_set = set(link_set).difference(set(tested_links))
+		link_set = set(link_set).difference(set(map(lambda x: x.replace('http', 'https'), tested_links)))
+		link_set = list(link_set)
+		for link in link_set:
+			if "http://www.harveynorman.co.nz/store-finder.html" in str(link):
+				link_set.remove(link)
+			elif "https://stores.harveynorman.co.nz" in str(link):
+				link_set.remove(link)
 		for link in link_set:
 			# Crawl them right away!
 			# Enqueue them too
@@ -225,7 +230,6 @@ def find_emails_2_level_deep(url):
 				continue
 			email_set = find_emails_in_html(html)
 			db.enqueue(link, list(email_set))
-
 		# We return an empty set
 		return set()
 
@@ -263,7 +267,7 @@ def find_links_in_html_with_same_hostname(url, html):
 			continue
 		try:
 			link = str(link)
-			if link.startswith("/"):
+			if link.startswith("/") and not link.startswith("//"):
 				link_set.add('http://' + url.netloc + link)
 			elif link.startswith("http") or link.startswith("https"):
 				if (link.find(url.netloc)):
@@ -295,17 +299,17 @@ MAX_SEARCH_RESULTS = CAHE[0].split("||")[-1]
 logger.info('Crawl up your max result: %s' % MAX_SEARCH_RESULTS)
 MAX_SEARCH_RESULTS = int(MAX_SEARCH_RESULTS)
 for ln in CAHE[1:-1]:
-	NICE_LINKS.append('http://' + str(ln).replace('\n', '/'))
+	NICE_LINKS.append('http://' + str(ln).replace('\n', ''))
 logger.info('Crawl up %s nice links !' % str(len(set(NICE_LINKS))))
 logger.info("All addon integration complete")
 logger.info("=" * 40)
 crawl(KEYWORDS, MAX_SEARCH_RESULTS, NICE_LINKS)
 
-"""
-DEBUG
+
 if __name__ == "__main__":
 	import sys
 
+	""" DEBUG
 	try:
 		arg = sys.argv[1].lower()
 		if (arg == '--emails') or (arg == '-e'):

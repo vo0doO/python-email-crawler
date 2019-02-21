@@ -81,6 +81,19 @@ class CrawlerDb:
 			.values(has_crawled=True, emails=new_emails)
 		self.connection.execute(stmt)
 
+	def url_from_test(self):
+		if not self.connected:
+			return False
+
+		s = select([self.website_table]).where(self.website_table.c.has_crawled == True)
+		res = self.connection.execute(s)
+		result = res.fetchall()
+		res.close()
+		crawled_urls = []
+		for i in result:
+			crawled_urls.append(i[1])
+		return crawled_urls
+
 	def get_all_emails(self):
 		if not self.connected:
 			return None
@@ -125,7 +138,7 @@ class CrawlerDb:
 	def save_html(filename, html):
 		# noinspection PyMethodFirstArgAssignment,PyMethodFirstArgAssignment
 		filename = os.path.dirname(os.path.abspath(__file__)) + '/data/index.html'
-		file = open(filename, "w+")
+		file = open(filename, "a+")
 		file.writelines(html)
 		file.close()
 
