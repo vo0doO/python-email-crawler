@@ -1,8 +1,9 @@
-import logging
-
+import time
 DEBUG = True 					# Whether or not to show DEBUG level messages
 USE_COLORS = True 				# Whether or not colors should be used when outputting text
-
+EMAILS_FILENAME = 'data/emails.csv'
+DOMAINS_FILENAME = 'data/domains.csv'
+ADDONS_INFO_FILENAME = 'link_for_crawler.txt'
 
 LOGGING = {						# dictConfig for output stream and file logging
 	'version': 1,              

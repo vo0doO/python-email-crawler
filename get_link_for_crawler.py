@@ -3,9 +3,12 @@ from urllib.parse import urlsplit
 import os
 import logging
 from urllib.parse import urlencode
+import time
+
+
 LOGGING2 = {						# dictConfig for output stream and file logging
 	'version': 1,
-    'disable_existing_loggers': False,
+	'disable_existing_loggers': False,
 
 	'formatters': {
 		'console': {
@@ -45,46 +48,40 @@ LOGGING2 = {						# dictConfig for output stream and file logging
 		},
 	}
 }
+ADDONS_INFO_FILENAME = 'link_for_crawler.txt'
 
 logging.makeLogRecord(LOGGING2)
 logger = logging.getLogger('voodoo_logger')
 
 
-def link_getter(query):
+def link_getter(query, max_res):
 	link_a = []
-	query = input('Каков будет Ваш запрос... ? ')
-	query = query.replace(" ", "+").replace("(", "%28").replace(")", "%29").replace("\"", "%22")
-	max_res = input('А сколько максимум будет выдано результатов ? ')
+	query_url = query.replace(" ", "+").replace("(", "%28").replace(")", "%29").replace("\"", "%22")
 	max_int = int(max_res)
 	for i in range(0, max_int, 10):
-		url = f"https://www.google.com/search?q={query}&start={i}"
+		url = f"https://www.google.com/search?q={query_url}&start={i}"
 		session = HTMLSession()
-		r = session.get(url)
 		print("=" * 40)
-		print('Page: %s' % url)
+		print('Search from page: %s' % url)
 		print("Processing...")
+		r = session.get(url)
 		for link in r.html.absolute_links:
 			if 'google' not in link:
 				if 'blogger' not in link:
 					if 'youtube' not in link:
 						link = urlsplit(link).netloc
-						if link not in link_a:
+						if link not in set(link_a):
 							link_a.append(link)
-							print(link)
-	with open(os.path.dirname(os.path.abspath(__file__)) + '/link_for_crawler.txt', 'w') as f:
+							print(f"New domain: {link} !!!")
+							print("I'm search next >>> ")
+	with open(ADDONS_INFO_FILENAME, 'w') as f:
+		f.write(str(query)+'||'+str(max_res) + "\n")
 		for ln in set(link_a):
 			print(ln)
 			f.write(ln + "\n")
 
 
-
 if __name__ == "__main__":
-	import sys
-	try:
-		if sys.argv[1] is not None:
-			arg = sys.argv[1].lower()
-			link_getter()
-		else:
-			link_getter(None)
-	except:
-		link_getter(None)
+	query = input('Каков будет Ваш запрос... ? ')
+	max_res = input('А сколько максимум будет выдано результатов ? ')
+	link_getter(query, max_res)

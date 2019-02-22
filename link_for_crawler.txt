@@ -1,0 +1,10 @@
+buy (emf OR geiger OR TDS OR "blood pressure" OR "massaging pad") (monitor OR sensor OR detector) -soeks -Amazon -google -blogger -YouTube -ebay||10
+www.berkeleywellness.com
+hotline.ua
+www.medshop.com.au
+www.guardian.com.sg
+www.chemistwarehouse.com.au
+egypt.souq.com
+www.medisana.com
+www.which.co.uk
+www.boots.ie
