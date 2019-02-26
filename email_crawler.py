@@ -41,6 +41,9 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 	# Step. 0.1: up links of image search in db.
 	url = 'http://www.google.com/search?' + urlencode(query) + '&source=lnms&tbm=isch&sa=X&ved=0'
 	search_url_anal(url)
+	# Stem 0.2 add url from google shopping search 
+	url = 'https://www.google.com/search?' + urlencode(query) + '&tbm=shop&prmd=sivn&source=lnms&sa=X&ved=0'
+	search_url(url)	
 
 
 	# Step 1: GooglePageScan
