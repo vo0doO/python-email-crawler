@@ -43,7 +43,7 @@ def crawl(keywords, MAX_SEARCH_RESULTS, NICE_LINKS):
 	search_url_anal(url)
 	# Stem 0.2 add url from google shopping search 
 	url = 'https://www.google.com/search?' + urlencode(query) + '&tbm=shop&prmd=sivn&source=lnms&sa=X&ved=0'
-	search_url(url)	
+	search_url_anal(url)	
 
 
 	# Step 1: GooglePageScan
