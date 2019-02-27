@@ -1,10 +1,8 @@
 from requests_html import HTMLSession
 from urllib.parse import urlsplit
-import os
-import logging
 from urllib.parse import urlencode
 import time
-
+import logging
 
 LOGGING2 = {						# dictConfig for output stream and file logging
 	'version': 1,
@@ -74,6 +72,7 @@ def link_getter(query, max_res):
 							link_a.append(link)
 							print(f"New domain: {link} !!!")
 							print("I'm search next >>> ")
+							time.sleep(0.035)
 	with open(ADDONS_INFO_FILENAME, 'w') as f:
 		f.write(str(query)+'||'+str(max_res) + "\n")
 		for ln in set(link_a):
