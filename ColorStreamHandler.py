@@ -7,16 +7,16 @@ class ColorStreamHandler(logging.Handler):
 		logging.Handler.__init__(self)
 		self.use_colors = use_colors
 
-		# Initialize environment
+		# Инициализировать среду
 		curses.setupterm()
 
-		# Get the foreground color attribute for this environment
+		# Получить атрибут цвета переднего плана для этой среды
 		self.fcap = curses.tigetstr('setaf')
 
-		#Get the normal attribute
+		# Получить нормальный атрибут
 		self.COLOR_NORMAL = curses.tigetstr('sgr0')
 
-		# Get + Save the color sequences
+		# Get + Сохранить цветовые последовательности
 		self.COLOR_INFO = curses.tparm(self.fcap, curses.COLOR_GREEN)
 		self.COLOR_ERROR = curses.tparm(self.fcap, curses.COLOR_RED)
 		self.COLOR_WARNING = curses.tparm(self.fcap, curses.COLOR_YELLOW)
@@ -38,7 +38,7 @@ class ColorStreamHandler(logging.Handler):
 		record.msg = record.msg.encode('utf-8', 'ignore')
 		msg = self.format(record)
 
-		# This just removes the date and milliseconds from asctime
+		# Это просто удаляет дату и миллисекунды из asctime
 		temp = msg.split(']')
 		msg = '[' + temp[0].split(' ')[1].split(',')[0] + ']' + temp[1]
 
@@ -46,7 +46,7 @@ class ColorStreamHandler(logging.Handler):
 			msg = self.color(msg, record.levelname)
 		print msg
 
-# 'record' has the following attributes:
+# 'record' имеет следующие атрибуты:
 # threadName
 # name
 # thread
